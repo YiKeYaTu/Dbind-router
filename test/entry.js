@@ -1,4 +1,4 @@
-import { Router, Link } from '../src/index';
+import { Router, Link } from '../index';
 import Dbind from 'dbind';
 
 const indexApp = Dbind.createClass({
@@ -48,7 +48,7 @@ const rootApp = Dbind.createClass({
 
 const App = Dbind.createClass({
   data: {
-    rootPath: '/Dbind-router',
+    rootPath: '/Dbind-router/test',
     routeConfig: {
       path: '/',
       component: rootApp,
