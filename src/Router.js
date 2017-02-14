@@ -2,6 +2,7 @@ import Dbind from 'dbind';
 import { Router, setRootLocation, redirect } from 'dbind-router-base';
 
 export default Dbind.createClass({
+  keepProps: ['rootPath', 'routeConfig'],
   willMount() {
     const routeConfig = this.props.routeConfig;
     const rootPath = this.props.rootPath;
@@ -11,6 +12,14 @@ export default Dbind.createClass({
     setRootLocation(rootPath);
     const Route = new Router();
     this.handlePath(routeConfig, Route, [], 0);
+  },
+  getPropsStr(props) {
+    let propsStr = '';
+    for (let key in props) {
+      if (this.keepProps.indexOf(key) === -1)
+        propsStr += `${key}="${props[key]}" `;
+    }
+    return propsStr;
   },
   handlePath(routeConfig, Route, target, index) {
     const component = routeConfig.component;
@@ -52,7 +61,10 @@ export default Dbind.createClass({
   data: {
     componentInf: { }
   },
-  template: `
-    <component data-from="componentInf.component" children="{{ componentInf.children || {} }}"></component>
-  `
+  template () {
+    let propsStr = this.getPropsStr(this.props);
+    return `
+      <component ${propsStr} data-from="componentInf.component" children="{{ componentInf.children || {} }}"></component>
+    `
+  }
 });
