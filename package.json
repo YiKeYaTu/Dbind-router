@@ -1,6 +1,6 @@
 {
   "name": "dbind-router",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "observer.js的路由组件",
   "main": "LazyBox.js",
   "scripts": {
