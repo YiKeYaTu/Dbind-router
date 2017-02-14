@@ -25,19 +25,19 @@ export default Dbind.createClass({
     const component = routeConfig.component;
     const path = routeConfig.path;
     const redirect = routeConfig.redirect;
-    const onCb = routeConfig.on;
+    const enterCb = routeConfig.enter;
     const leaveCb = routeConfig.leave;
     Route = Route.route(routeConfig.path, function(next) {
       if(redirect) {
         redirect({}, redirect);
       } else {
         target[index] = component;
-          onCb && onCb();
-          if(!next()) {
-            this.trackingUpdate({
-              componentInf: this.arrayToTree(target, index)
-            });
-          }
+        component.enter = enterCb;
+        if(!next()) {
+          this.trackingUpdate({
+            componentInf: this.arrayToTree(target, index)
+          });
+        }
       }
       
     }.bind(this));
