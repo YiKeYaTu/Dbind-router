@@ -32,7 +32,7 @@ export default Dbind.createClass({
         redirect({}, redirect);
       } else {
         target[index] = component;
-        component.enter = enterCb;
+        component.componentInf.enter = enterCb;
         if(!next()) {
           this.trackingUpdate({
             componentInf: this.arrayToTree(target, index)
@@ -49,12 +49,16 @@ export default Dbind.createClass({
     }
   },
   arrayToTree(array, end) {
-    const tree = {};
-    let p = tree;
-    for(let i = 0; i <= end; i ++) {
-      p.component = array[i];
-      p.children = (i !== end && array[i + 1]) || null;
-      p = p.children;
+    let tree = {
+      component: array[0]
+    };
+    let prev = tree;
+    for (let i = 1; i <= end; i++) {
+      let temp = {
+        component: array[i]
+      };
+      prev.children = temp;
+      prev = temp;
     }
     return tree;
   },

@@ -142,6 +142,7 @@
 	}
 
 	exports.default = _dbind2.default.createClass({
+	  keepProps: ['rootPath', 'routeConfig'],
 	  willMount: function willMount() {
 	    var routeConfig = this.props.routeConfig;
 	    var rootPath = this.props.rootPath;
@@ -152,20 +153,27 @@
 	    var Route = new _dbindRouterBase.Router();
 	    this.handlePath(routeConfig, Route, [], 0);
 	  },
+	  getPropsStr: function getPropsStr(props) {
+	    var propsStr = '';
+	    for (var key in props) {
+	      if (this.keepProps.indexOf(key) === -1) propsStr += key + '="' + props[key] + '" ';
+	    }
+	    return propsStr;
+	  },
 	  handlePath: function handlePath(routeConfig, Route, target, index) {
 	    var _this = this;
 
 	    var component = routeConfig.component;
 	    var path = routeConfig.path;
 	    var redirect = routeConfig.redirect;
-	    var onCb = routeConfig.on;
+	    var enterCb = routeConfig.enter;
 	    var leaveCb = routeConfig.leave;
 	    Route = Route.route(routeConfig.path, function (next) {
 	      if (redirect) {
 	        redirect({}, redirect);
 	      } else {
 	        target[index] = component;
-	        onCb && onCb();
+	        component.enter = enterCb;
 	        if (!next()) {
 	          this.trackingUpdate({
 	            componentInf: this.arrayToTree(target, index)
@@ -194,7 +202,10 @@
 	  data: {
 	    componentInf: {}
 	  },
-	  template: '\n    <component data-from="componentInf.component" children="{{ componentInf.children || {} }}"></component>\n  '
+	  template: function template() {
+	    var propsStr = this.getPropsStr(this.props);
+	    return '\n      <component ' + propsStr + ' data-from="componentInf.component" children="{{ componentInf.children || {} }}"></component>\n    ';
+	  }
 	});
 
 /***/ },
@@ -2644,8 +2655,10 @@
 	        if ((typeof routeObj === 'undefined' ? 'undefined' : _typeof(routeObj)) === 'object' && typeof routeObj.callback === 'function') {
 	            this.isRunningCallback = true;
 	            routeObj.callback.call(context, this._next.bind(this));
+	            return true;
 	        } else {
 	            this.isRunningCallback = false;
+	            return false;
 	        }
 	    };
 	    History.prototype._match = function (previousLocation) {
@@ -2813,7 +2826,6 @@
 	    */
 	    var controllers = new History('', 0);
 	    var timer = setTimeout(function () {
-	        console.log(11212);
 	        controllers._match();
 	    });
 	    /*

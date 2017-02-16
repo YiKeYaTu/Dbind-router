@@ -7,7 +7,7 @@ export default Dbind.createClass({
   },
   template: `
     <a ref="link" href="{{ to }}">
-      {{ value }}
+      <component data-from="children"></component>
     </a>
   `
 });
