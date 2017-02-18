@@ -172,8 +172,13 @@
 	      if (redirect) {
 	        redirect({}, redirect);
 	      } else {
-	        target[index] = component;
-	        component.enter = enterCb;
+	        if (target[index] !== component) {
+	          target[index] = component;
+	          component.cbFuncs.push({
+	            funcName: 'routeEnter',
+	            query: [routeConfig.path.replace(/(^\/)|(\/$)/g, '')]
+	          });
+	        }
 	        if (!next()) {
 	          this.trackingUpdate({
 	            componentInf: this.arrayToTree(target, index)
@@ -189,18 +194,23 @@
 	    }
 	  },
 	  arrayToTree: function arrayToTree(array, end) {
-	    var tree = {};
-	    var p = tree;
-	    for (var i = 0; i <= end; i++) {
-	      p.component = array[i];
-	      p.children = i !== end && array[i + 1] || null;
-	      p = p.children;
+	    var tree = {
+	      component: array[0]
+	    };
+	    var prev = tree;
+	    for (var i = 1; i <= end; i++) {
+	      var temp = {
+	        component: array[i]
+	      };
+	      prev.children = temp;
+	      prev = temp;
 	    }
 	    return tree;
 	  },
-
-	  data: {
-	    componentInf: {}
+	  data: function data() {
+	    return {
+	      componentInf: {}
+	    };
 	  },
 	  template: function template() {
 	    var propsStr = this.getPropsStr(this.props);
@@ -2919,10 +2929,11 @@
 	    }
 	    return propsStr;
 	  },
-
-	  data: {
-	    component: null,
-	    props: null
+	  data: function data() {
+	    return {
+	      component: null,
+	      props: null
+	    };
 	  },
 	  template: function template() {
 	    var props = this.props;
@@ -2962,7 +2973,7 @@
 	    (0, _dbindRouterBase.capture)(this.refs.link);
 	  },
 
-	  template: '\n    <a ref="link" href="{{ to }}">\n      {{ value }}\n    </a>\n  '
+	  template: '\n    <a ref="link" href="{{ to }}">\n      <component data-from="children"></component>\n    </a>\n  '
 	});
 
 /***/ }

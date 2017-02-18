@@ -23,9 +23,11 @@ const LazyBox = Dbind.createClass({
     }
     return propsStr;
   },
-  data: {
-    component: null,
-    props: null
+  data() {
+    return {
+      component: null,
+      props: null
+    }
   },
   template() {
     const props = this.props;

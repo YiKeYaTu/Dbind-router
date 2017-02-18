@@ -27,13 +27,27 @@ export default Dbind.createClass({
     const redirect = routeConfig.redirect;
     const enterCb = routeConfig.enter;
     const leaveCb = routeConfig.leave;
-    Route = Route.route(routeConfig.path, function(next) {
+
+    Route = Route.route(path, function(next) {
       if(redirect) {
         redirect({}, redirect);
       } else {
-        target[index] = component;
-        component.componentInf.enter = enterCb;
-        if(!next()) {
+        if(
+          !target[index] || 
+            ( target[index].component !== component || 
+              target[index].component === component && target[index].path !== path
+            )
+          ) {
+          target[index] = {
+            path,
+            component
+          };
+          component.cbFuncs.push({
+            funcName: 'routeEnter',
+            query: [path.replace(/(^\/)|(\/$)/g, '')]
+          });
+        }
+        if (!next()) {
           this.trackingUpdate({
             componentInf: this.arrayToTree(target, index)
           });
@@ -50,20 +64,22 @@ export default Dbind.createClass({
   },
   arrayToTree(array, end) {
     let tree = {
-      component: array[0]
+      component: array[0].component
     };
     let prev = tree;
     for (let i = 1; i <= end; i++) {
       let temp = {
-        component: array[i]
+        component: array[i].component
       };
       prev.children = temp;
       prev = temp;
     }
     return tree;
   },
-  data: {
-    componentInf: { }
+  data() {
+    return {
+      componentInf: { }
+      }
   },
   template () {
     let propsStr = this.getPropsStr(this.props);
