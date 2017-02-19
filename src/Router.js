@@ -74,6 +74,9 @@ export default Dbind.createClass({
       prev.children = temp;
       prev = temp;
     }
+    for (let i = end + 1, len = array.length; i < len; i ++) {
+      array[i] = null;
+    }
     return tree;
   },
   data() {

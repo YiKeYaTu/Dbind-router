@@ -168,15 +168,19 @@
 	    var redirect = routeConfig.redirect;
 	    var enterCb = routeConfig.enter;
 	    var leaveCb = routeConfig.leave;
-	    Route = Route.route(routeConfig.path, function (next) {
+
+	    Route = Route.route(path, function (next) {
 	      if (redirect) {
 	        redirect({}, redirect);
 	      } else {
-	        if (target[index] !== component) {
-	          target[index] = component;
+	        if (!target[index] || target[index].component !== component || target[index].component === component && target[index].path !== path) {
+	          target[index] = {
+	            path: path,
+	            component: component
+	          };
 	          component.cbFuncs.push({
 	            funcName: 'routeEnter',
-	            query: [routeConfig.path.replace(/(^\/)|(\/$)/g, '')]
+	            query: [path.replace(/(^\/)|(\/$)/g, '')]
 	          });
 	        }
 	        if (!next()) {
@@ -195,15 +199,18 @@
 	  },
 	  arrayToTree: function arrayToTree(array, end) {
 	    var tree = {
-	      component: array[0]
+	      component: array[0].component
 	    };
 	    var prev = tree;
 	    for (var i = 1; i <= end; i++) {
 	      var temp = {
-	        component: array[i]
+	        component: array[i].component
 	      };
 	      prev.children = temp;
 	      prev = temp;
+	    }
+	    for (var _i = end + 1, len = array.length; _i < len; _i++) {
+	      array[_i] = null;
 	    }
 	    return tree;
 	  },
