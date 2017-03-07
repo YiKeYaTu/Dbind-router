@@ -11,7 +11,13 @@ export default Dbind.createClass({
 
     setRootLocation(rootPath);
     const Route = new Router();
-    this.handlePath(routeConfig, Route, [], 0);
+    if(Object.prototype.toString.call(routeConfig) === '[object Array]') {
+      routeConfig.forEach((children) => {
+        this.handlePath(children, Route, [], 0);
+      });
+    } else {
+      this.handlePath(routeConfig, Route, [], 0);
+    }
   },
   getPropsStr(props) {
     let propsStr = '';

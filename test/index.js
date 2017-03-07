@@ -144,6 +144,8 @@
 	exports.default = _dbind2.default.createClass({
 	  keepProps: ['rootPath', 'routeConfig'],
 	  willMount: function willMount() {
+	    var _this = this;
+
 	    var routeConfig = this.props.routeConfig;
 	    var rootPath = this.props.rootPath;
 	    if (!routeConfig) throw new TypeError('You should hava a routeConfig props for router to control route');
@@ -151,7 +153,13 @@
 
 	    (0, _dbindRouterBase.setRootLocation)(rootPath);
 	    var Route = new _dbindRouterBase.Router();
-	    this.handlePath(routeConfig, Route, [], 0);
+	    if (Object.prototype.toString.call(routeConfig) === '[object Array]') {
+	      routeConfig.forEach(function (children) {
+	        _this.handlePath(children, Route, [], 0);
+	      });
+	    } else {
+	      this.handlePath(routeConfig, Route, [], 0);
+	    }
 	  },
 	  getPropsStr: function getPropsStr(props) {
 	    var propsStr = '';
@@ -161,7 +169,7 @@
 	    return propsStr;
 	  },
 	  handlePath: function handlePath(routeConfig, Route, target, index) {
-	    var _this = this;
+	    var _this2 = this;
 
 	    var component = routeConfig.component;
 	    var path = routeConfig.path;
@@ -193,7 +201,7 @@
 
 	    if (routeConfig.children) {
 	      routeConfig.children.forEach(function (children) {
-	        _this.handlePath(children, Route, target, index + 1);
+	        _this2.handlePath(children, Route, target, index + 1);
 	      });
 	    }
 	  },
